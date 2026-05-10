@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(git clone *)",
+      "Bash(Rename-Item *)",
+      "PowerShell(Rename-Item *)",
+      "PowerShell(pip install *)"
+    ]
+  }
+}

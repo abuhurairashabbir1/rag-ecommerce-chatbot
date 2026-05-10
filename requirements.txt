@@ -1,0 +1,7 @@
+requests
+  sentence-transformers
+  numpy
+  flask
+  flask-cors
+  openai
+  python-dotenv
