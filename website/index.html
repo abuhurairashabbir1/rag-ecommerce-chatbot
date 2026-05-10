@@ -203,5 +203,168 @@
         </li>
       </ul>
     </footer>
+
+  <!-- ========== CHAT WIDGET ========== -->
+  <style>
+    #chat-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #222;
+      color: #fff;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 50px;
+      font-size: 15px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    #chat-box {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 24px;
+      width: 320px;
+      height: 420px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 1000;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #chat-header {
+      background: #222;
+      color: #fff;
+      padding: 14px 16px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    #chat-messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      height: 300px;
+    }
+
+    .msg-bot, .msg-user {
+      max-width: 80%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .msg-bot {
+      background: #f0f0f0;
+      color: #222;
+      align-self: flex-start;
+    }
+
+    .msg-user {
+      background: #222;
+      color: #fff;
+      align-self: flex-end;
+    }
+
+    #chat-footer {
+      display: flex;
+      border-top: 1px solid #eee;
+      padding: 8px;
+      gap: 6px;
+    }
+
+    #chat-input {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    #chat-send {
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+
+  <button id="chat-toggle">💬 Support</button>
+
+  <div id="chat-box">
+    <div id="chat-header">🛒 Downy Support</div>
+    <div id="chat-messages">
+      <div class="msg-bot">Hi! 👋 How can I help you today?</div>
+    </div>
+    <div id="chat-footer">
+      <input id="chat-input" type="text" placeholder="Type a message..." />
+      <button id="chat-send">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const toggle   = document.getElementById('chat-toggle');
+    const chatBox  = document.getElementById('chat-box');
+    const input    = document.getElementById('chat-input');
+    const send     = document.getElementById('chat-send');
+    const messages = document.getElementById('chat-messages');
+
+    toggle.addEventListener('click', () => {
+      chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    function addMessage(text, sender) {
+      const div = document.createElement('div');
+      div.classList.add(sender === 'user' ? 'msg-user' : 'msg-bot');
+      div.textContent = text;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage(message, 'user');
+      input.value = '';
+
+      addMessage('Typing...', 'bot');
+
+      fetch('http://localhost:5000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        messages.lastChild.remove();
+        addMessage(data.reply, 'bot');
+      })
+      .catch(() => {
+        messages.lastChild.remove();
+        addMessage('Sorry, I am unavailable right now.', 'bot');
+      });
+    }
+
+    send.addEventListener('click', sendMessage);
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
+  <!-- ========== END CHAT WIDGET ========== -->
+
   </body>
 </html>
